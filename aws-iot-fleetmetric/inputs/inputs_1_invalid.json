@@ -1,0 +1,12 @@
+{
+  "MetricName": "CfnFleetMetricTestName2",
+  "QueryString": "*",
+  "Period": 60,
+  "AggregationField": "thingName",
+  "AggregationType" : {
+    "Name": "InvalidName",
+    "Values": ["count"]
+  },
+  "IndexName": "AWS_Things"
+}
+

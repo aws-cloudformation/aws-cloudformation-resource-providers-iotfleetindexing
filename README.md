@@ -1,11 +1,5 @@
-## My Project
-
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+## aws-cloudformation-resource-providers-iotfleetindexing
+The CloudFormation Resource Provider Package for AWS IoT Fleet Indexing.
 
 ## Security
 
