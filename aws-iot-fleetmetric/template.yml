@@ -21,4 +21,3 @@ Resources:
       Handler: com.amazonaws.iot.fleetmetric.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-iot-fleetmetric-handler-1.0-SNAPSHOT.jar
-

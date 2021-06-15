@@ -72,7 +72,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             return event;
         }
 
-        // For an exiting resource, we have to update via TagResource API, Update API doesn't take tags.
+        // For an existing resource, we have to update via TagResource API, Update API doesn't take tags.
         try {
             DescribeFleetMetricRequest describeFleetMetricRequest = DescribeFleetMetricRequest.builder()
                     .metricName(desiredModel.getMetricName())

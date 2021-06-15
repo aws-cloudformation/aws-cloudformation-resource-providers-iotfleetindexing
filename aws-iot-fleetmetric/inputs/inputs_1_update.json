@@ -3,9 +3,11 @@
   "QueryString": "*",
   "Period": 120,
   "AggregationField": "thingName",
-  "AggregationType" : {
+  "AggregationType": {
     "Name": "Statistics",
-    "Values": ["count"]
+    "Values": [
+      "count"
+    ]
   },
   "IndexName": "AWS_Things"
 }
