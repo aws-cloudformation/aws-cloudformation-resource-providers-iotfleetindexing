@@ -1,5 +1,5 @@
 {
-  "MetricName": "CfnFleetMetricTestName2",
+  "MetricName": "CfnFleetMetricTestName1",
   "QueryString": "*",
   "Period": 60,
   "AggregationField": "thingName",

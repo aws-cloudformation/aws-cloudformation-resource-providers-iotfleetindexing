@@ -32,10 +32,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.amazonaws.iot.fleetmetric.TestConstants.DESIRED_TAGS;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_FIELD;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE_NAME;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE_VALUES;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_ARN;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_INDEX_NAME;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_NAME;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_PERIOD;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_QUERY_STRING;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_RESOURCE_MODEL;
 import static com.amazonaws.iot.fleetmetric.TestConstants.MODEL_TAGS;
 import static com.amazonaws.iot.fleetmetric.TestConstants.SDK_SYSTEM_TAG;
@@ -240,6 +246,26 @@ public class UpdateHandlerTest {
         ProgressEvent<ResourceModel, CallbackContext> progressEvent =
                 handler.handleRequest(proxy, request, null, logger);
         assertThat(progressEvent.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
+    }
+
+    @Test
+    public void handleRequest_ModifyReadOnlyField_VerifyTranslation() {
+        // adding ARN in update request would fail
+        ResourceModel desiredModel = getDesiredModel();
+        desiredModel.setMetricArn(FLEET_METRIC_ARN);
+
+        ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(desiredModel)
+                .logicalResourceIdentifier(FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER)
+                .desiredResourceTags(DESIRED_TAGS)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
+
+        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
     }
 
     private ResourceModel getDesiredModel() {

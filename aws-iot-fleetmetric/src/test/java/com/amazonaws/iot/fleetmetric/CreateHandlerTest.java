@@ -21,6 +21,7 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import static com.amazonaws.iot.fleetmetric.TestConstants.DESIRED_TAGS;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_FIELD;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE_NAME;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE_VALUES;
@@ -105,6 +106,36 @@ public class CreateHandlerTest {
         assertThat(actualRequest.queryString()).isEqualTo(FLEET_METRIC_QUERY_STRING);
         assertThat(actualRequest.aggregationType()).isEqualTo(FLEET_METRIC_AGGREGATION_TYPE);
         assertThat(actualRequest.period()).isEqualTo(FLEET_METRIC_PERIOD);
+    }
+
+    @Test
+    public void handleRequest_ModifyReadOnlyField_VerifyTranslation() {
+        // adding ARN in create request would fail
+        ResourceModel fmResourceModel = ResourceModel.builder()
+                .metricArn(FLEET_METRIC_ARN)
+                .metricName(FLEET_METRIC_NAME)
+                .queryString(FLEET_METRIC_QUERY_STRING)
+                .indexName(FLEET_METRIC_INDEX_NAME)
+                .aggregationField(FLEET_METRIC_AGGREGATION_FIELD)
+                .aggregationType(AggregationType.builder()
+                        .name(FLEET_METRIC_AGGREGATION_TYPE_NAME)
+                        .values(FLEET_METRIC_AGGREGATION_TYPE_VALUES)
+                        .build())
+                .period(FLEET_METRIC_PERIOD)
+                .build();
+
+        ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(fmResourceModel)
+                .logicalResourceIdentifier(FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER)
+                .desiredResourceTags(DESIRED_TAGS)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
+
+        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
     }
 
     @Test

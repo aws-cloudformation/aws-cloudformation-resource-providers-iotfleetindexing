@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.iot.model.UntagResourceRequest;
 import software.amazon.awssdk.services.iot.model.UpdateFleetMetricRequest;
 import software.amazon.awssdk.utils.StringUtils;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
@@ -44,7 +45,10 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         ResourceModel desiredModel = request.getDesiredResourceState();
         String desiredArn = desiredModel.getMetricArn();
         if (!StringUtils.isEmpty(desiredArn)) {
-            logger.log("MetricArn cannot be updated and will be ignored. Caller tried setting it to " + desiredArn);
+            logger.log(String.format("MetricArn is read-only, but the caller passed %s.", desiredModel.getMetricArn()));
+            // Note: this is necessary even though MetricArn is marked readOnly in the schema.
+            return ProgressEvent.failed(desiredModel, callbackContext, HandlerErrorCode.InvalidRequest,
+                    "MetricArn is a read-only property and cannot be set.");
         }
 
         try {
