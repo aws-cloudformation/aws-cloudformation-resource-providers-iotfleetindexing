@@ -45,10 +45,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         ResourceModel desiredModel = request.getDesiredResourceState();
         String desiredArn = desiredModel.getMetricArn();
         if (!StringUtils.isEmpty(desiredArn)) {
-            logger.log(String.format("MetricArn is read-only, but the caller passed %s.", desiredModel.getMetricArn()));
-            // Note: this is necessary even though MetricArn is marked readOnly in the schema.
-            return ProgressEvent.failed(desiredModel, callbackContext, HandlerErrorCode.InvalidRequest,
-                    "MetricArn is a read-only property and cannot be set.");
+            logger.log(String.format("MetricArn is read-only, but the caller passed %s. Ignored.", desiredModel.getMetricArn()));
         }
 
         try {

@@ -249,23 +249,39 @@ public class UpdateHandlerTest {
     }
 
     @Test
-    public void handleRequest_ModifyReadOnlyField_VerifyTranslation() {
-        // adding ARN in update request would fail
+    public void handleRequest_ModifyReadOnlyField_VerifyIgnored() {
+        ResourceModel previousModel = FLEET_METRIC_RESOURCE_MODEL;
         ResourceModel desiredModel = getDesiredModel();
         desiredModel.setMetricArn(FLEET_METRIC_ARN);
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .previousResourceState(previousModel)
                 .desiredResourceState(desiredModel)
-                .logicalResourceIdentifier(FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER)
-                .desiredResourceTags(DESIRED_TAGS)
-                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        doReturn(ImmutableSet.of())
+                .when(handler)
+                .listTags(proxy, FLEET_METRIC_ARN, logger);
+
+        doReturn(UpdateFleetMetricResponse.builder().build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(UpdateFleetMetricRequest.class), any());
+        doReturn(DescribeFleetMetricResponse.builder().metricArn(FLEET_METRIC_ARN).build())
+                .when(proxy)
+                .injectCredentialsAndInvokeV2(any(DescribeFleetMetricRequest.class), any());
+
+        ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, null, logger);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+        assertThat(response.getResourceModel()).isEqualTo(desiredModel);
     }
 
     private ResourceModel getDesiredModel() {
