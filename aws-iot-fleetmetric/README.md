@@ -1,6 +1,7 @@
 # AWS::IoT::FleetMetric
 
-1. The JSON schema of fleet metric resource is located in `aws-iot-fleetmetric.json`
+1. Ensure you have the latest CFN CLI https://github.com/aws-cloudformation/cloudformation-cli. Sample command for upgrade `pip install --upgrade cloudformation-cli cloudformation-cli-java-plugin`
+1. The JSON schema of fleet metric resource is in `aws-iot-fleetmetric.json`
 1. Check the src folder for resource handlers implementations
 1. For local testing, check CFN CLI.
    1. Public doc reference https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-walkthrough

@@ -29,3 +29,9 @@ phases:
         else
           echo "$CODEBUILD_SRC_DIR is empty"
         fi
+      # install internal SDK (Java)
+      - cd "$CODEBUILD_SRC_DIR_SDK"
+      - mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file --batch-mode -Dfile=cloudformation-2.5.11.jar -DgroupId=software.amazon.awssdk -DartifactId=iot -Dversion=1.0-SNAPSHOT -Dpackaging=jar
+
+
+
