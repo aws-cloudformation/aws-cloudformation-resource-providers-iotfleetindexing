@@ -8,6 +8,10 @@
 # BlueJ files
 *.ctxt
 
+# Mac OS
+.DS_Store
+._*
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -27,12 +31,16 @@ hs_err_pid*
 *.iml
 .vscode/
 .idea/
+.project
+out.java
+out/
 
 # Build
 target/
 build/
 gradle/
 wrapper/
+.hypothesis/
 
 # Generated Files
 .classpath
@@ -41,3 +49,8 @@ wrapper/
 .settings/
 .gradle/
 docs/
+rpdk.log*
+
+# contains credentials
+sam-tests/
+
