@@ -163,8 +163,10 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
     // It would be nicer to instead pass HandlerUtils (which we can mock)
     // to the constructor, but the framework requires the constructor to have 0 args.
     @VisibleForTesting
-    Set<Tag> listTags(AmazonWebServicesClientProxy proxy,
-                      String resourceArn, Logger logger) {
+    Set<Tag> listTags(
+            AmazonWebServicesClientProxy proxy,
+            String resourceArn,
+            Logger logger) {
         List<Tag> tags = HandlerUtils.listTags(iotClient, proxy, resourceArn, logger);
         return new HashSet<>(tags);
     }

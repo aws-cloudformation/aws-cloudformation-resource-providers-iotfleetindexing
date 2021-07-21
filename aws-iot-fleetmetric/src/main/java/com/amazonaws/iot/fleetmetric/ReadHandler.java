@@ -77,8 +77,9 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
     // It would be nicer to instead pass HandlerUtils (which we can mock)
     // to the constructor, but the framework requires the constructor to have 0 args.
     @VisibleForTesting
-    List<software.amazon.awssdk.services.iot.model.Tag> listTags(AmazonWebServicesClientProxy proxy,
-                                                                 String resourceArn, Logger logger) {
+    List<software.amazon.awssdk.services.iot.model.Tag> listTags(
+            AmazonWebServicesClientProxy proxy,
+            String resourceArn, Logger logger) {
         return HandlerUtils.listTags(iotClient, proxy, resourceArn, logger);
     }
 }

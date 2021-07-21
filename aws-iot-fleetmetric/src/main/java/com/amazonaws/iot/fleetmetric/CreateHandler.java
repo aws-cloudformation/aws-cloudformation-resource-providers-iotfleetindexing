@@ -84,7 +84,8 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             // allTags.putAll(request.getDesiredResourceTags());
             request.getDesiredResourceTags().entrySet().stream()
                     .filter(e -> !e.getKey().startsWith(AWS_SYSTEM_TAG_PREFIX))
-                    .forEach(e -> allTags.put(e.getKey(), e.getValue()));        }
+                    .forEach(e -> allTags.put(e.getKey(), e.getValue()));
+        }
         if (request.getSystemTags() != null) {
             // There are also system tags provided separately.
             // SystemTags are the default stack-level tags with aws:cloudformation prefix
