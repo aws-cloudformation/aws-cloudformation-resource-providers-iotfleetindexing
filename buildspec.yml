@@ -2,13 +2,17 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-        java: openjdk8
-        python: 3.7
+      java: openjdk8
+      python: 3.7
     commands:
-      -  pip install pre-commit cloudformation-cli-java-plugin
+      - pip install pyyaml --upgrade
+      - pip install --upgrade 'six~=1.15.0'
+      - pip install pre-commit cloudformation-cli-java-plugin
   build:
     commands:
       - pre-commit run --all-files
+      - cd "$CODEBUILD_SRC_DIR_SDK"
+      - mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file --batch-mode -Dfile=AwsJavaSdk-Iot-2.0.jar -DgroupId=software.amazon.awssdk -DartifactId=iot -Dversion=1.0-SNAPSHOT -Dpackaging=jar
       - |
         if [ "$(ls -A $CODEBUILD_SRC_DIR)" ]; then
           cd $CODEBUILD_SRC_DIR
