@@ -31,7 +31,7 @@
       "type": "object",
       "properties": {
         "Name": {
-          "description": "Fleet Indexing aggregation names such as Statistics, Percentiles and Cardinality",
+          "description": "Fleet Indexing aggregation type names such as Statistics, Percentiles and Cardinality",
           "type": "string"
         },
         "Values": {
