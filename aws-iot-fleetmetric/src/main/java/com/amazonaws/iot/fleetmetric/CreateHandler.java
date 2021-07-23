@@ -55,8 +55,8 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             logger.log(String.format("Resource already exists %s.", model.getMetricName()));
             throw new CfnAlreadyExistsException(e);
         } catch (ResourceNotFoundException e) {
-            logger.log(String.format("Indexing is not enabled when creating %s.", model.getMetricName()));
-            logger.log(String.format("Message: %s, stack trace: %s", e.getMessage(), ExceptionUtils.getStackTrace(e)));
+            logger.log(String.format("Indexing is not enabled when creating %s. Message: %s, stack trace: %s",
+                    model.getMetricName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.NotFound, e.getMessage());
         } catch (RuntimeException e) {
             return Translator.translateExceptionToProgressEvent(model, e, logger);
@@ -80,22 +80,23 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             // DesiredResourceTags includes both model and stack-level tags.
             // Reference: https://tinyurl.com/yyxtd7w6
 
-            // TODO add system tags back once FleetMetric auth is ready
+            // TODO add system tags back once FleetMetric adds the support
             // allTags.putAll(request.getDesiredResourceTags());
             request.getDesiredResourceTags().entrySet().stream()
                     .filter(e -> !e.getKey().startsWith(AWS_SYSTEM_TAG_PREFIX))
                     .forEach(e -> allTags.put(e.getKey(), e.getValue()));
         }
-        if (request.getSystemTags() != null) {
-            // There are also system tags provided separately.
-            // SystemTags are the default stack-level tags with aws:cloudformation prefix
-            // TODO add system tags back once FleetMetric auth is ready
-            // allTags.putAll(request.getSystemTags());
-        } else {
-            // System tags should always be present as long as the Handler is called by CloudFormation
-            logger.log("Unexpectedly, system tags are null in the create request for " +
-                    ResourceModel.TYPE_NAME + " " + model.getMetricName());
-        }
+
+        // TODO add system tags back once FleetMetric adds the support
+//        if (request.getSystemTags() != null) {
+//            // There are also system tags provided separately.
+//            // SystemTags are the default stack-level tags with aws:cloudformation prefix
+//             allTags.putAll(request.getSystemTags());
+//        } else {
+//            // System tags should always be present as long as the Handler is called by CloudFormation
+//             logger.log("Unexpectedly, system tags are null in the create request for " +
+//                  ResourceModel.TYPE_NAME + " " + model.getMetricName());
+//        }
 
         return CreateFleetMetricRequest.builder()
                 .metricName(model.getMetricName())
