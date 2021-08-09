@@ -117,7 +117,10 @@
     "MetricName"
   ],
   "readOnlyProperties": [
-    "/properties/MetricArn"
+    "/properties/MetricArn",
+    "/properties/CreationDate",
+    "/properties/LastModifiedDate",
+    "/properties/Version"
   ],
   "createOnlyProperties": [
     "/properties/MetricName"
