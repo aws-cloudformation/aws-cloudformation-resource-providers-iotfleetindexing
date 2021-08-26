@@ -7,6 +7,8 @@ import software.amazon.awssdk.services.iot.IotClient;
 import software.amazon.awssdk.services.iot.model.AggregationType;
 import software.amazon.awssdk.services.iot.model.CreateFleetMetricRequest;
 import software.amazon.awssdk.services.iot.model.CreateFleetMetricResponse;
+import software.amazon.awssdk.services.iot.model.DescribeFleetMetricRequest;
+import software.amazon.awssdk.services.iot.model.DescribeFleetMetricResponse;
 import software.amazon.awssdk.services.iot.model.ResourceAlreadyExistsException;
 import software.amazon.awssdk.services.iot.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
@@ -45,6 +47,27 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             // Note: this is necessary even though MetricArn is marked readOnly in the schema.
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest,
                     "MetricArn is a read-only property and cannot be set.");
+        }
+
+        DescribeFleetMetricResponse describeFleetMetricResponse = null;
+        try {
+            DescribeFleetMetricRequest describeFleetMetricRequest = DescribeFleetMetricRequest.builder()
+                    .metricName(model.getMetricName())
+                    .build();
+            describeFleetMetricResponse = proxy.injectCredentialsAndInvokeV2(
+                    describeFleetMetricRequest, iotClient::describeFleetMetric);
+        } catch (ResourceNotFoundException e) {
+            // expected
+        } catch (RuntimeException e) {
+            return Translator.translateExceptionToProgressEvent(model, e, logger);
+        }
+
+        if (describeFleetMetricResponse != null) {
+            // According to CFN's expectation, if the FleetMetric already exists, createHandler should report a failure.
+            // https://github.com/aws-cloudformation/cloudformation-cli/blob/653024cfaab7ecfb8ba7c70212f2fecbabb4b095/src/rpdk/core/contract/suite/handler_create.py#L39
+            logger.log(String.format("Resource already exists %s.", model.getMetricName()));
+            throw new CfnAlreadyExistsException(ResourceAlreadyExistsException.builder()
+                    .resourceArn(describeFleetMetricResponse.metricArn()).build());
         }
 
         CreateFleetMetricResponse createFleetMetricResponse;
@@ -88,15 +111,15 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         // TODO add system tags back once FleetMetric adds the support
-//        if (request.getSystemTags() != null) {
-//            // There are also system tags provided separately.
-//            // SystemTags are the default stack-level tags with aws:cloudformation prefix
-//             allTags.putAll(request.getSystemTags());
-//        } else {
-//            // System tags should always be present as long as the Handler is called by CloudFormation
-//             logger.log("Unexpectedly, system tags are null in the create request for " +
-//                  ResourceModel.TYPE_NAME + " " + model.getMetricName());
-//        }
+        //        if (request.getSystemTags() != null) {
+        //            // There are also system tags provided separately.
+        //            // SystemTags are the default stack-level tags with aws:cloudformation prefix
+        //             allTags.putAll(request.getSystemTags());
+        //        } else {
+        //            // System tags should always be present as long as the Handler is called by CloudFormation
+        //             logger.log("Unexpectedly, system tags are null in the create request for " +
+        //                  ResourceModel.TYPE_NAME + " " + model.getMetricName());
+        //        }
 
         return CreateFleetMetricRequest.builder()
                 .metricName(model.getMetricName())

@@ -128,7 +128,7 @@
     "/properties/MetricName"
   ],
   "primaryIdentifier": [
-    "/properties/MetricArn"
+    "/properties/MetricName"
   ],
   "handlers": {
     "create": {

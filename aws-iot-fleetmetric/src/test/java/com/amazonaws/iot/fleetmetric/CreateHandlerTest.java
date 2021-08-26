@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.iot.IotClient;
 import software.amazon.awssdk.services.iot.model.CreateFleetMetricRequest;
 import software.amazon.awssdk.services.iot.model.CreateFleetMetricResponse;
+import software.amazon.awssdk.services.iot.model.DescribeFleetMetricRequest;
+import software.amazon.awssdk.services.iot.model.DescribeFleetMetricResponse;
 import software.amazon.awssdk.services.iot.model.ResourceAlreadyExistsException;
 import software.amazon.awssdk.services.iot.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
@@ -37,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -74,7 +77,11 @@ public class CreateHandlerTest {
                 .metricName(FLEET_METRIC_NAME)
                 .metricArn(FLEET_METRIC_ARN)
                 .build();
-        when(proxy.injectCredentialsAndInvokeV2(any(), any())).thenReturn(createFleetMetricResponse);
+        when(proxy.injectCredentialsAndInvokeV2(any(), any()))
+                // describeFM call
+                .thenThrow(ResourceNotFoundException.builder().build())
+                // createFM call
+                .thenReturn(createFleetMetricResponse);
 
         ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
 
@@ -97,7 +104,7 @@ public class CreateHandlerTest {
         assertThat(response.getResourceModel().getIndexName()).isEqualTo(FLEET_METRIC_INDEX_NAME);
 
         ArgumentCaptor<CreateFleetMetricRequest> requestCaptor = ArgumentCaptor.forClass(CreateFleetMetricRequest.class);
-        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        verify(proxy, times(2)).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
         CreateFleetMetricRequest actualRequest = requestCaptor.getValue();
         // Order doesn't matter for tags, but they're modeled as a List, thus we have to check field by field.
         // TODO add system tags back once FleetMetric gets FAS policies ready
@@ -147,7 +154,43 @@ public class CreateHandlerTest {
                 .build();
 
         when(proxy.injectCredentialsAndInvokeV2(any(), any()))
+                // describeFM call
+                .thenThrow(ResourceNotFoundException.builder().build())
+                // createFM call
                 .thenThrow(ResourceAlreadyExistsException.builder().build());
+
+        assertThatThrownBy(() ->
+                handler.handleRequest(proxy, request, null, logger))
+                .isInstanceOf(CfnAlreadyExistsException.class);
+    }
+
+    @Test
+    public void handleRequest_DescribeExistsResource_VerifyTranslation() {
+        ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(FLEET_METRIC_RESOURCE_MODEL)
+                .logicalResourceIdentifier(FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER)
+                .desiredResourceTags(DESIRED_TAGS)
+                .build();
+
+        when(proxy.injectCredentialsAndInvokeV2(any(), any()))
+                // describeFM call
+                .thenReturn(DescribeFleetMetricResponse.builder().metricName("testFM").metricArn("testArn").build());
+
+        assertThatThrownBy(() ->
+                handler.handleRequest(proxy, request, null, logger))
+                .isInstanceOf(CfnAlreadyExistsException.class);
+    }
+
+    @Test
+    public void handleRequest_DescribeResultExists_VerifyTranslation() {
+        ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(FLEET_METRIC_RESOURCE_MODEL)
+                .logicalResourceIdentifier(FLEET_METRIC_LOGICAL_RESOURCE_IDENTIFIER)
+                .desiredResourceTags(DESIRED_TAGS)
+                .build();
+
+        when(proxy.injectCredentialsAndInvokeV2(any(DescribeFleetMetricRequest.class), any()))
+                .thenReturn(DescribeFleetMetricResponse.builder().metricName("testFM").metricArn("testFMArn").build());
 
         assertThatThrownBy(() ->
                 handler.handleRequest(proxy, request, null, logger))
