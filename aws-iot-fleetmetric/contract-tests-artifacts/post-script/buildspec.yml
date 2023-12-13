@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Nothing to do in pre_build phase
+  build:
+    commands:
+      - echo Disabling Fleet Indexing
+      - aws iot update-indexing-configuration --thing-indexing-configuration thingIndexingMode=OFF --region $AWS_REGION
+  post_build:
+    commands:
+      - echo Build completed at 'date'

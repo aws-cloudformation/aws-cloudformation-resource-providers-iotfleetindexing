@@ -25,6 +25,9 @@ import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATI
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_AGGREGATION_TYPE_VALUES;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_ARN;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_INDEX_NAME;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_VERSION;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_CREATION_DATE;
+import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_LAST_MODIFIED_DATE;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_NAME;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_PERIOD;
 import static com.amazonaws.iot.fleetmetric.TestConstants.FLEET_METRIC_QUERY_STRING;
@@ -73,6 +76,9 @@ public class ReadHandlerTest {
                 .period(FLEET_METRIC_PERIOD)
                 .queryString(FLEET_METRIC_QUERY_STRING)
                 .indexName(FLEET_METRIC_INDEX_NAME)
+                .version(FLEET_METRIC_VERSION)
+                .creationDate(FLEET_METRIC_CREATION_DATE)
+                .lastModifiedDate(FLEET_METRIC_LAST_MODIFIED_DATE)
                 .build();
         when(proxy.injectCredentialsAndInvokeV2(eq(expectedDescribeRequest), any()))
                 .thenReturn(describeResponse);
@@ -100,6 +106,9 @@ public class ReadHandlerTest {
                 .isEqualTo(FLEET_METRIC_AGGREGATION_TYPE_VALUES);
         assertThat(response.getResourceModel().getPeriod()).isEqualTo(FLEET_METRIC_PERIOD);
         assertThat(response.getResourceModel().getIndexName()).isEqualTo(FLEET_METRIC_INDEX_NAME);
+        assertThat(response.getResourceModel().getVersion()).isEqualTo((double)FLEET_METRIC_VERSION);
+        assertThat(response.getResourceModel().getCreationDate()).isEqualTo(FLEET_METRIC_CREATION_DATE.toString());
+        assertThat(response.getResourceModel().getLastModifiedDate()).isEqualTo(FLEET_METRIC_LAST_MODIFIED_DATE.toString());
     }
 
     @Test

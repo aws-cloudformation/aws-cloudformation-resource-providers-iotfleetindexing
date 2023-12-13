@@ -69,6 +69,11 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                                 .name(describeFleetMetricResponse.aggregationType().nameAsString())
                                 .values(describeFleetMetricResponse.aggregationType().values())
                                 .build())
+                        .version((double)describeFleetMetricResponse.version())
+                        .creationDate(describeFleetMetricResponse.creationDate() == null ?
+                                        null : describeFleetMetricResponse.creationDate().toString())
+                        .lastModifiedDate(describeFleetMetricResponse.lastModifiedDate() == null ?
+                                        null : describeFleetMetricResponse.lastModifiedDate().toString())
                         .tags(responseTags)
                         .build());
     }

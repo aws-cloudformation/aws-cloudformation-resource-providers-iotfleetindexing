@@ -1,0 +1,50 @@
+{
+  "CreateInputs": {
+    "MetricName": "CfnFleetMetricTestName1",
+    "QueryString": "*",
+    "Period": 60,
+    "AggregationField": "registry.version",
+    "AggregationType": {
+      "Name": "Statistics",
+      "Values": [
+        "count",
+        "sum"
+      ]
+    },
+    "IndexName": "AWS_Things",
+    "Description": "FM for CFN contract test",
+    "Unit": "None",
+    "Tags": [
+      {
+        "Key": "Key1",
+        "Value": "Value1"
+      }
+    ]
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "/QueryString",
+      "value": "thingName:*"
+    },
+    {
+      "op": "replace",
+      "path": "/AggregationField",
+      "value": "shadow.version"
+    },
+    {
+      "op": "replace",
+      "path": "/Period",
+      "value": 120
+    },
+    {
+      "op": "add",
+      "path": "/AggregationType/Values/2",
+      "value": "average"
+    },
+    {
+      "op": "remove",
+      "path": "/AggregationType/Values/0"
+    }
+  ]
+}

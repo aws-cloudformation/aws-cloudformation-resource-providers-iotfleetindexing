@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Nothing to do in pre_build phase
+  build:
+    commands:
+      - echo Updating indexing configuration to RS
+      - aws iot update-indexing-configuration --region $AWS_REGION --thing-indexing-configuration thingIndexingMode=REGISTRY_AND_SHADOW
+      - while [ -z "$(aws iot describe-index --region $AWS_REGION --index-name AWS_Things | grep ACTIVE)" ]; do echo AWS_Things index still building; sleep 1; done
+      - echo AWS_Things index is ACTIVE
+  post_build:
+    commands:
+      - echo Build completed at 'date'

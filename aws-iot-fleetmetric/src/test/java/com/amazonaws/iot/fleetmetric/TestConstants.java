@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import software.amazon.awssdk.services.iot.model.FleetMetricNameAndArn;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ public class TestConstants {
     protected static final String FLEET_METRIC_QUERY_STRING = "thingName:*";
     protected static final String FLEET_METRIC_AGGREGATION_FIELD = "testField";
     protected static final String FLEET_METRIC_AGGREGATION_TYPE_NAME = "Statistics";
+    protected static final Long FLEET_METRIC_VERSION = 1L;
+    protected static final Instant FLEET_METRIC_CREATION_DATE = Instant.now();
+    protected static final Instant FLEET_METRIC_LAST_MODIFIED_DATE = Instant.now();
     protected static final List<String> FLEET_METRIC_AGGREGATION_TYPE_VALUES = Arrays.asList("count", "sum", "average");
     protected static final software.amazon.awssdk.services.iot.model.AggregationType FLEET_METRIC_AGGREGATION_TYPE =
             software.amazon.awssdk.services.iot.model.AggregationType.builder()
